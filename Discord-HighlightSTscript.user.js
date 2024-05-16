@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Discord - Highlight STscript
 // @namespace    https://github.com/LenAnderson
-// @downloadURL  https://github.com/LenAnderson/Discord-HighlightSTscript/raw/master/Discord-HighlightSTscript.user.js
+// @downloadURL  https://github.com/LenAnderson/Discord-HighlightSTscript/raw/main/Discord-HighlightSTscript.user.js
 // @version      1.0.0
 // @description  try to take over the world!
 // @author       LenAnderson
