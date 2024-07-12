@@ -2,7 +2,7 @@
 // @name         Discord - Highlight STscript
 // @namespace    https://github.com/LenAnderson
 // @downloadURL  https://github.com/LenAnderson/Discord-HighlightSTscript/raw/main/Discord-HighlightSTscript.user.js
-// @version      1.0.0
+// @version      1.1.0
 // @description  try to take over the world!
 // @author       LenAnderson
 // @match        https://discord.com/*
@@ -47,6 +47,7 @@
     --ac-style-color-punctuationL2: rgba(98 160 251 / 1);
     --ac-style-color-currentParenthesis: rgba(195 118 210 / 1);
     --ac-style-color-comment: rgba(122 151 90 / 1);
+    --ac-style-color-keyword: rgba(182 137 190 / 1);
 	}
 	.hljs.language-stscript {
     * { text-shadow: none !important; }
@@ -66,6 +67,7 @@
     .hljs-keyword { color: var(--ac-style-color-variableLanguage); }
     .hljs-comment { color: var(--ac-style-color-comment); }
     .hljs-abort { color: var(--ac-style-color-abort, #e38e23); }
+	.hljs-keyword { color: var(--ac-style-color-keyword); }
 
     .hljs-closure {
         > .hljs-punctuation { color: var(--ac-style-color-punctuation); }
@@ -120,10 +122,10 @@
 
         function getQuotedRunRegex() {
             try {
-                return new RegExp('(".+?(?<!\\\\)")|(\\S+?)');
+                return new RegExp('(".+?(?<!\\\\)")|(\\S+?)(\\||$|\\s)');
             } catch {
                 // fallback for browsers that don't support lookbehind
-                return /(".+?")|(\S+?)/;
+                return /(".+?")|(\S+?)(\||$|\s)/;
             }
         }
 
@@ -135,8 +137,16 @@
         };
         const ABORT = {
             scope: 'abort',
-            begin: /\/abort/,
+            begin: /\/(abort|breakpoint)/,
             end: /\||$|:}/,
+            contains: [],
+        };
+        const KEYWORD = {
+            scope: 'command',
+            begin: /\/(import)/,
+            beginScope: 'keyword',
+            end: /\||$|(?=:})/,
+            excludeEnd: true,
             contains: [],
         };
         const LET = {
@@ -208,6 +218,14 @@
             MACRO,
             CLOSURE,
         );
+        KEYWORD.contains.push(
+            hljs.BACKSLASH_ESCAPE,
+            NAMED_ARG,
+            NUMBER,
+            MACRO,
+            CLOSURE,
+            hljs.QUOTE_STRING_MODE,
+        );
         LET.contains.push(
             hljs.BACKSLASH_ESCAPE,
             NAMED_ARG,
@@ -244,6 +262,7 @@
             hljs.BACKSLASH_ESCAPE,
             COMMENT,
             ABORT,
+            KEYWORD,
             NAMED_ARG,
             NUMBER,
             MACRO,
@@ -262,6 +281,7 @@
                 hljs.BACKSLASH_ESCAPE,
                 COMMENT,
                 ABORT,
+                KEYWORD,
                 RUN,
                 LET,
                 GETVAR,
