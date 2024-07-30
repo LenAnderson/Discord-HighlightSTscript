@@ -2,7 +2,7 @@
 // @name         Discord - Highlight STscript
 // @namespace    https://github.com/LenAnderson
 // @downloadURL  https://github.com/LenAnderson/Discord-HighlightSTscript/raw/main/Discord-HighlightSTscript.user.js
-// @version      1.2.0
+// @version      1.2.1
 // @description  try to take over the world!
 // @author       LenAnderson
 // @match        https://discord.com/*
@@ -25,13 +25,15 @@
     console.log('[STSCRIPT]', hljs);
 	GM_addStyle(`
 	:root {
-	--ac-style-color-border: rgba(69 69 69 / 1);
+    --ac-style-color-border: rgba(69 69 69 / 1);
     --ac-style-color-background: rgba(32 32 32 / 1);
     --ac-style-color-text: rgba(204 204 204 / 1);
     --ac-style-color-matchedBackground: rgba(0 0 0 / 0);
     --ac-style-color-matchedText: rgba(108 171 251 / 1);
     --ac-style-color-selectedBackground: rgba(32 57 92 / 1);
     --ac-style-color-selectedText: rgba(255 255 255 / 1);
+    --ac-style-color-notSelectableBackground: rgb(65, 78, 95);
+    --ac-style-color-notSelectableText: rgba(255 255 255 / 1);
     --ac-style-color-hoveredBackground: rgba(43 45 46 / 1);
     --ac-style-color-hoveredText: rgba(204 204 204 / 1);
     --ac-style-color-argName: rgba(171 209 239 / 1);
@@ -56,31 +58,88 @@
     background-color: var(--ac-style-color-background);
     color: var(--ac-style-color-text);
 
-    .hljs-title.function_ { color: var(--ac-style-color-cmd); }
-    .hljs-title.function_.invoke__ { color: var(--ac-style-color-cmd); }
-    .hljs-string { color: var(--ac-style-color-string); }
-    .hljs-number { color: var(--ac-style-color-number); }
-    .hljs-variable { color: var(--ac-style-color-variable); }
-    .hljs-variable.language_ { color: var(--ac-style-color-variableLanguage); }
-    .hljs-property { color: var(--ac-style-color-argName); }
-    .hljs-punctuation { color: var(--ac-style-color-punctuation); }
-    .hljs-keyword { color: var(--ac-style-color-variableLanguage); }
-    .hljs-comment { color: var(--ac-style-color-comment); }
-    .hljs-abort { color: var(--ac-style-color-abort, #e38e23); }
-	.hljs-keyword { color: var(--ac-style-color-keyword); }
+    .hljs-title.function_ {
+        color: var(--ac-style-color-cmd);
+    }
+
+    .hljs-title.function_.invoke__ {
+        color: var(--ac-style-color-cmd);
+    }
+
+    .hljs-string {
+        color: var(--ac-style-color-string);
+    }
+
+    .hljs-number {
+        color: var(--ac-style-color-number);
+    }
+
+    .hljs-variable {
+        color: var(--ac-style-color-variable);
+    }
+
+    .hljs-variable.language_ {
+        color: var(--ac-style-color-variableLanguage);
+    }
+
+    .hljs-property {
+        color: var(--ac-style-color-argName);
+    }
+
+    .hljs-punctuation {
+        color: var(--ac-style-color-punctuation);
+    }
+
+    .hljs-comment {
+        color: var(--ac-style-color-comment);
+    }
+
+    .hljs-abort {
+        color: var(--ac-style-color-abort, #e38e23);
+        font-weight: bold;
+    }
+
+    .hljs-keyword {
+        color: var(--ac-style-color-keyword);
+        font-weight: bold;
+    }
+
+    .hljs-pipe {
+        color: var(--ac-style-color-punctuation);
+    }
+    .hljs-pipebreak {
+        color: var(--ac-style-color-type);
+    }
 
     .hljs-closure {
-        > .hljs-punctuation { color: var(--ac-style-color-punctuation); }
+        >.hljs-punctuation {
+            color: var(--ac-style-color-punctuation);
+        }
+
         .hljs-closure {
-            > .hljs-punctuation { color: var(--ac-style-color-punctuationL1); }
+            >.hljs-punctuation {
+                color: var(--ac-style-color-punctuationL1);
+            }
+
             .hljs-closure {
-                > .hljs-punctuation { color: var(--ac-style-color-punctuationL2); }
+                >.hljs-punctuation {
+                    color: var(--ac-style-color-punctuationL2);
+                }
+
                 .hljs-closure {
-                    > .hljs-punctuation { color: var(--ac-style-color-punctuation); }
+                    >.hljs-punctuation {
+                        color: var(--ac-style-color-punctuation);
+                    }
+
                     .hljs-closure {
-                        > .hljs-punctuation { color: var(--ac-style-color-punctuationL1); }
+                        >.hljs-punctuation {
+                            color: var(--ac-style-color-punctuationL1);
+                        }
+
                         .hljs-closure {
-                            > .hljs-punctuation { color: var(--ac-style-color-punctuationL2); }
+                            >.hljs-punctuation {
+                                color: var(--ac-style-color-punctuationL2);
+                            }
                         }
                     }
                 }
