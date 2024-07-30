@@ -2,7 +2,7 @@
 // @name         Discord - Highlight STscript
 // @namespace    https://github.com/LenAnderson
 // @downloadURL  https://github.com/LenAnderson/Discord-HighlightSTscript/raw/main/Discord-HighlightSTscript.user.js
-// @version      1.1.0
+// @version      1.2.0
 // @description  try to take over the world!
 // @author       LenAnderson
 // @match        https://discord.com/*
@@ -102,7 +102,7 @@
             variants: [
                 // DecimalLiteral
                 { begin: `(\\b(${decimalInteger})((${frac})|\\.)?|(${frac}))` +
-        `[eE][+-]?(${decimalDigits})\\b` },
+				 `[eE][+-]?(${decimalDigits})\\b` },
                 { begin: `\\b(${decimalInteger})\\b((${frac})\\b|\\.)?|(${frac})\\b` },
 
                 // DecimalBigIntegerLiteral
@@ -129,6 +129,12 @@
             }
         }
 
+        const BLOCK_COMMENT = {
+            scope: 'comment',
+            begin: /\/\*/,
+            end: /\*\|/,
+            contains: [],
+        };
         const COMMENT = {
             scope: 'comment',
             begin: /\/[/#]/,
@@ -136,17 +142,29 @@
             contains: [],
         };
         const ABORT = {
-            scope: 'abort',
             begin: /\/(abort|breakpoint)/,
-            end: /\||$|:}/,
+            beginScope: 'abort',
+            end: /\||$|(?=:})/,
+            excludeEnd: false,
+            returnEnd: true,
             contains: [],
         };
-        const KEYWORD = {
+        const IMPORT = {
             scope: 'command',
             begin: /\/(import)/,
             beginScope: 'keyword',
             end: /\||$|(?=:})/,
-            excludeEnd: true,
+            excludeEnd: false,
+            returnEnd: true,
+            contains: [],
+        };
+        const BREAK = {
+            scope: 'command',
+            begin: /\/(break)/,
+            beginScope: 'keyword',
+            end: /\||$|(?=:})/,
+            excludeEnd: false,
+            returnEnd: true,
             contains: [],
         };
         const LET = {
@@ -157,26 +175,31 @@
                 1: 'variable',
             },
             end: /\||$|:}/,
+            excludeEnd: false,
+            returnEnd: true,
             contains: [],
         };
         const SETVAR = {
             begin: /\/(setvar|setglobalvar)\s+/,
             beginScope: 'variable',
             end: /\||$|:}/,
-            excludeEnd: true,
+            excludeEnd: false,
+            returnEnd: true,
             contains: [],
         };
         const GETVAR = {
             begin: /\/(getvar|getglobalvar)\s+/,
             beginScope: 'variable',
             end: /\||$|:}/,
-            excludeEnd: true,
+            excludeEnd: false,
+            returnEnd: true,
             contains: [],
         };
         const RUN = {
             match: [
                 /\/:/,
                 getQuotedRunRegex(),
+                /\||$|(?=:})/,
             ],
             className: {
                 1: 'variable.language',
@@ -189,7 +212,8 @@
             begin: /\/\S+/,
             beginScope: 'title.function',
             end: /\||$|(?=:})/,
-            excludeEnd: true,
+            excludeEnd: false,
+            returnEnd: true,
             contains: [], // defined later
         };
         const CLOSURE = {
@@ -210,6 +234,19 @@
             begin: /{{/,
             end: /}}/,
         };
+        const PIPEBREAK = {
+            beginScope: 'pipebreak',
+            begin: /\|\|/,
+            end: '',
+        };
+        const PIPE = {
+            beginScope: 'pipe',
+            begin: /\|/,
+            end: '',
+        };
+        BLOCK_COMMENT.contains.push(
+            BLOCK_COMMENT,
+        );
         RUN.contains.push(
             hljs.BACKSLASH_ESCAPE,
             NAMED_ARG,
@@ -218,7 +255,15 @@
             MACRO,
             CLOSURE,
         );
-        KEYWORD.contains.push(
+        IMPORT.contains.push(
+            hljs.BACKSLASH_ESCAPE,
+            NAMED_ARG,
+            NUMBER,
+            MACRO,
+            CLOSURE,
+            hljs.QUOTE_STRING_MODE,
+        );
+        BREAK.contains.push(
             hljs.BACKSLASH_ESCAPE,
             NAMED_ARG,
             NUMBER,
@@ -250,6 +295,14 @@
             MACRO,
             CLOSURE,
         );
+        ABORT.contains.push(
+            hljs.BACKSLASH_ESCAPE,
+            NAMED_ARG,
+            NUMBER,
+            MACRO,
+            CLOSURE,
+            hljs.QUOTE_STRING_MODE,
+        );
         COMMAND.contains.push(
             hljs.BACKSLASH_ESCAPE,
             NAMED_ARG,
@@ -260,9 +313,11 @@
         );
         CLOSURE.contains.push(
             hljs.BACKSLASH_ESCAPE,
+            BLOCK_COMMENT,
             COMMENT,
             ABORT,
-            KEYWORD,
+            IMPORT,
+            BREAK,
             NAMED_ARG,
             NUMBER,
             MACRO,
@@ -273,21 +328,27 @@
             COMMAND,
             'self',
             hljs.QUOTE_STRING_MODE,
+            PIPEBREAK,
+            PIPE,
         );
         hljs.registerLanguage('stscript', ()=>({
             case_insensitive: false,
-            keywords: ['|'],
+            keywords: [],
             contains: [
                 hljs.BACKSLASH_ESCAPE,
+                BLOCK_COMMENT,
                 COMMENT,
                 ABORT,
-                KEYWORD,
+                IMPORT,
+                BREAK,
                 RUN,
                 LET,
                 GETVAR,
                 SETVAR,
                 COMMAND,
                 CLOSURE,
+                PIPEBREAK,
+                PIPE,
             ],
         }));
     };
